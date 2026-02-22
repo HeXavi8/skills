@@ -1,7 +1,7 @@
 ---
 name: qrcode
 description: Generate styled QR codes (SVG/PNG/JPG) from user input. Supports custom module color, background, dot shape and eye shape, and many output options.
-homepage: https://example.com
+homepage: https://github.com/HeXavi8/skills
 metadata:
   {
     "clawdbot":
