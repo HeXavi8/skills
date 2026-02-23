@@ -761,3 +761,174 @@ site:arxiv.org ("cs.RO") AND ("embodied" OR "VLA" OR "manipulation" OR "humanoid
 ("Unitree" OR "AGIBOT" OR "UBTECH" OR "Galbot" OR "Fourier") after:2026-02-16
 ("China humanoid robot" OR "具身智能" OR "人形机器人") after:2026-02-16
 ```
+
+---
+
+## Safety, Compliance & Neutrality Standards
+
+### Content Safety Requirements
+
+Before including any story in the briefing, verify:
+
+- [ ] **Legal Compliance**: Content does not violate local laws or regulations
+- [ ] **No Sensitive Information**: Excludes classified, confidential, or proprietary technical details not publicly disclosed
+- [ ] **No Misinformation**: Claims are cross-verified with authoritative sources
+- [ ] **No Harmful Content**: Excludes content promoting violence, discrimination, illegal activities, or harm
+- [ ] **Respect Embargoes**: Honors publication embargoes and non-disclosure agreements
+- [ ] **Age-Appropriate**: Suitable for general professional audience
+
+**If any safety concern is detected → exclude the story and log for review.**
+
+---
+
+### Geopolitical Neutrality
+
+Maintain strict objectivity when covering international topics:
+
+**Neutral Language Guidelines:**
+
+| Topic                     | ❌ Avoid                      | ✅ Use                             |
+| ------------------------- | ----------------------------- | ---------------------------------- |
+| International competition | "China threatens US lead"     | "China expands robotics capacity"  |
+| Technology development    | "US dominates AI research"    | "US institutions publish X papers" |
+| Policy & regulation       | "Restrictive export controls" | "New export control regulations"   |
+| Market dynamics           | "Winning the robotics race"   | "Growth in robotics deployment"    |
+
+**When covering regional ecosystems:**
+
+- Treat all regions (US, China, EU, etc.) with equal journalistic standards
+- Present facts and metrics without "winning/losing" framing
+- Include diverse perspectives when covering policy or competition
+- Avoid amplifying nationalist rhetoric from any side
+
+---
+
+### Source Compliance
+
+**Respect website policies and legal requirements:**
+
+#### Paywalls & Access Control
+
+- **Never circumvent** paywalls or access restrictions
+- If content is paywalled: note "[Full article behind paywall]" and provide legitimate access link
+- Use only publicly available excerpts or abstracts
+
+#### Web Scraping Ethics
+
+- **Always respect** `robots.txt` directives
+- **Rate limiting**: Maximum 1 request per second per domain
+- **User-Agent**: Identify as a news aggregation bot
+- **Comply** with each source's Terms of Service
+
+#### Copyright & Attribution
+
+- Provide summaries, not full reproductions
+- Always link to the original source
+- Attribute quotes and data to the original publication
+- Respect Creative Commons and other licenses
+
+---
+
+### Data Privacy
+
+**Protect personal information:**
+
+- **No Personal Data Collection**: Do not collect or display emails, phone numbers, physical addresses, or other PII
+- **Anonymize**: Remove any accidentally scraped personal identifiers before output
+- **GDPR/CCPA Compliance**: If user data is stored for personalization, obtain explicit consent
+- **Researcher Privacy**: Use institutional affiliations, not personal contact info
+
+---
+
+### Sensitive Topics Handling
+
+**Exercise extra caution with:**
+
+#### Military & Defense Applications
+
+- **Only report** publicly disclosed information from official sources
+- **Exclude** leaked or classified defense technology details
+- **Context**: Note civilian applications when covering dual-use technologies
+
+#### Surveillance & Privacy
+
+- **Highlight** privacy implications and regulatory status
+- **Balance**: Present both capability announcements and ethical concerns
+- **Transparency**: Note if technology is used in controversial applications
+
+#### Labor & Economic Impact
+
+- **Multiple perspectives**: Include views from workers, companies, and economists
+- **Avoid sensationalism**: Use measured language about automation impact
+- **Context**: Note retraining programs and new job creation alongside displacement
+
+#### Safety Incidents
+
+- **Verify first**: Only report confirmed incidents from official sources
+- **No speculation**: Avoid unverified claims about causes or responsibility
+- **Follow-up**: Update when official investigation results are published
+
+---
+
+### Content Exclusion Rules
+
+**Automatically exclude:**
+
+1. **Illegal Content**
+   - Violations of export control laws (ITAR, EAR, Wassenaar)
+   - Leaked confidential documents or trade secrets
+   - Content promoting illegal activities
+
+2. **Misinformation**
+   - Unverified rumors about companies, personnel, or financials
+   - Content from sources with known misinformation track records
+   - Viral claims without credible source confirmation
+
+3. **Harmful Content**
+   - Explicit weapon systems (unless official government announcement)
+   - Content promoting discrimination or violence
+   - Malicious code or security exploits
+
+4. **Privacy Violations**
+   - Doxxing or personal information exposure
+   - Unauthorized disclosure of private communications
+   - Non-consensual personal data sharing
+
+**When in doubt → exclude and flag for human review.**
+
+---
+
+### Verification Protocol
+
+**For high-impact stories (funding >$100M, major deployments, safety incidents):**
+
+1. **Multi-source verification**: Require 2+ independent authoritative sources
+2. **Official confirmation**: Prefer company announcements or regulatory filings
+3. **Expert validation**: Cross-check technical claims against domain expertise
+4. **Temporal verification**: Ensure information is current, not recycled old news
+
+**Confidence levels:**
+
+- ✅ **Confirmed**: 3+ independent sources OR official company/government announcement
+- ⚠️ **Likely**: 2 sources OR 1 highly authoritative source (e.g., SEC filing)
+- ❓ **Unverified**: Single source, no corroboration → mark as "[Unconfirmed]" or exclude
+
+---
+
+### Compliance Checklist
+
+Before delivering any briefing, verify:
+
+- [ ] All sources are legally accessible and comply with their ToS
+- [ ] No paywalls were circumvented
+- [ ] Rate limits were respected (max 1 req/sec per domain)
+- [ ] No personal data (PII) is included in output
+- [ ] Language is geopolitically neutral
+- [ ] No sensitive military/classified information is disclosed
+- [ ] All high-impact claims are verified with multiple sources
+- [ ] Copyright and attribution requirements are met
+- [ ] No misinformation or unverified rumors are included
+
+**If any item fails → review and correct before delivery.**
+
+---
