@@ -1,12 +1,21 @@
-# skills
+# Skills
 
-A small collection of agent "skills" — each skill is a self-contained utility with a `SKILL.md` that documents usage and examples.
+A modular collection of agent skills — self-contained utilities designed for automation and integration. Each skill includes a comprehensive `SKILL.md` with usage documentation and examples.
 
-Available skills
+## Available Skills
 
-- [qrcode](qrcode/SKILL.md) — Generate styled QR codes (SVG/PNG/JPG) from text or URLs; supports color, dot/eye shapes, error correction and prints an `OUTPUT_FILE:` marker after generation.
-- [embodied-ai-news](embodied-ai-news/SKILL.md) — Aggregates and summarizes the latest embodied AI / robotics news (daily/weekly briefings, source recipes, and templates).
+### [QR Code Generator](qrcode/SKILL.md)
+Generate customizable QR codes in multiple formats (SVG/PNG/JPG) from text or URLs. Features include color customization, dot/eye shape options, and adjustable error correction levels.  
+🔗 [ClawHub Page](https://clawhub.ai/HeXavi8/qrcode)
 
-Run a skill by following the examples in its `SKILL.md` (most are Node-based and include `npm install` instructions when needed).
+### [Embodied AI News Aggregator](embodied-ai-news/SKILL.md)
+Automatically aggregates and summarizes the latest news in embodied AI and robotics. Supports daily/weekly briefings with customizable source recipes and templates.  
+🔗 [ClawHub Page](https://clawhub.ai/HeXavi8/embodied-ai-news)
 
-License: MIT (see `LICENSE`)
+## Getting Started
+
+Each skill can be run independently by following the instructions in its `SKILL.md`. Most skills are Node.js-based and include `npm install` setup when dependencies are required.
+
+## License
+
+MIT License - see [LICENSE](LICENSE) for details.
