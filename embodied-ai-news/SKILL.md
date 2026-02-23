@@ -42,7 +42,7 @@ This skill relies on 5 companion reference files. Always consult them during exe
 
 ```
 📁 references/
-├── 📰 news_source.md        — WHERE to find information (tiered source list)
+├── 📰 news_sources.md        — WHERE to find information (tiered source list)
 ├── 🔍 search_queries.md     — HOW to search (query templates & recipes)
 ├── 📝 output_templates.md   — WHAT format to output (6+ template variants)
 ├── 📊 taxonomy.md           — SHARED LANGUAGE (categories, keywords, company list)
@@ -51,7 +51,7 @@ This skill relies on 5 companion reference files. Always consult them during exe
 
 | File                  | When to Consult                                                                         |
 | --------------------- | --------------------------------------------------------------------------------------- |
-| `news_source.md`      | Phase 1 — choosing which sites to fetch; selecting tier-appropriate sources             |
+| `news_sources.md`     | Phase 1 — choosing which sites to fetch; selecting tier-appropriate sources             |
 | `search_queries.md`   | Phase 1 — building search queries; selecting recipe by briefing type                    |
 | `taxonomy.md`         | Phase 3 — classifying stories; Phase 1 — looking up company aliases & tech terms        |
 | `output_templates.md` | Phase 5 — rendering final output; selecting template by user request                    |
@@ -60,17 +60,17 @@ This skill relies on 5 companion reference files. Always consult them during exe
 ### File Interconnection Map
 
 ```
-┌─────────────────┐     ┌──────────────────┐     ┌───────────────┐     ┌──────────────────┐
-│  search_queries  │────▶│  news_source      │────▶│  Classify &   │────▶│ output_templates  │
-│  (discover)      │     │  (browse & verify) │     │  Prioritize   │     │  (generate)       │
-└─────────────────┘     └──────────────────┘     └───────────────┘     └──────────────────┘
+┌─────────────────┐      ┌────────────────────┐     ┌───────────────┐     ┌──────────────────┐
+│  search_queries │────▶ │  news_sources      │────▶│  Classify &   │────▶│ output_templates │
+│  (discover)     │      │  (browse & verify) │     │  Prioritize   │     │   (generate)     │
+└─────────────────┘      └────────────────────┘     └───────────────┘     └──────────────────┘
         ▲                        ▲                       ▲                        ▲
         │                        │                       │                        │
         └────────────────────────┴───────────────────────┴────────────────────────┘
-                                      workflow.md
+                                        workflow.md
                                  (orchestrates all phases)
-                                      taxonomy.md
-                                  (shared vocabulary for all)
+                                        taxonomy.md
+                                (shared vocabulary for all)
 ```
 
 ---
@@ -124,7 +124,7 @@ Phase 5: Output Formatting
 
 Use `mcp__web_reader__webReader` to fetch content from **3-5 sources** per session.
 
-**Source Selection** (refer to `news_source.md` for the full 6-tier source hierarchy):
+**Source Selection** (refer to `news_sources.md` for the full 6-tier source hierarchy):
 
 | Priority | Source                 | URL                                         | Tier | Why                               |
 | -------- | ---------------------- | ------------------------------------------- | ---- | --------------------------------- |
@@ -137,7 +137,7 @@ Use `mcp__web_reader__webReader` to fetch content from **3-5 sources** per sessi
 | Rotate   | Hugging Face Blog      | `https://huggingface.co/blog`               | T2   | Open-source model releases        |
 | Rotate   | NVIDIA Blog            | `https://developer.nvidia.com/blog/`        | T2   | Isaac / GR00T updates             |
 
-> **Full source list**: See `news_source.md` for all 6 tiers (Core Media → Company Blogs → Academic → General Tech → Podcasts → China/Regional), including RSS feeds, social accounts, and evaluation criteria.
+> **Full source list**: See `news_sources.md` for all 6 tiers (Core Media → Company Blogs → Academic → General Tech → Podcasts → China/Regional), including RSS feeds, social accounts, and evaluation criteria.
 
 **Parameters**:
 
@@ -255,7 +255,7 @@ For the top **8-15 most relevant stories** from Steps 1.1-1.3:
 **Priority for full fetch**:
 
 1. Stories appearing in multiple search results (high signal)
-2. Stories from Tier 1 sources (see `news_source.md` § Tier 1)
+2. Stories from Tier 1 sources (see `news_sources.md` § Tier 1)
 3. Stories mentioning key companies or technologies (see `taxonomy.md` § 4 & § 2)
 4. Stories with funding amounts, deployment numbers, or benchmark results
 
@@ -545,63 +545,6 @@ Score each story on 4 dimensions (each 1-5):
 
 ---
 
-## Monthly Workflow
-
-> Full details in `workflow.md` § Monthly Workflow (~3 hours)
-
-The monthly workflow consists of two parts:
-
-### Part A: Monthly Trend Report
-
-**Goal**: Produce a comprehensive monthly analysis covering the top stories, thematic deep dives, and forward-looking insights.
-
-| Step | Action                                   | Time   | Reference Files                                  |
-| ---- | ---------------------------------------- | ------ | ------------------------------------------------ |
-| 1    | Review all weekly reports from the month | 20 min | Previous outputs                                 |
-| 2    | Thematic deep dives (choose 2-3 themes)  | 60 min | `search_queries.md` all sections                 |
-| 3    | Generate monthly report                  | 40 min | `output_templates.md` § Deep + Monthly structure |
-
-**Common Monthly Themes** (from `workflow.md`):
-
-| Theme                     | What to Analyze                                 |
-| ------------------------- | ----------------------------------------------- |
-| Model Architecture Trends | VLA vs. Diffusion vs. World Model traction      |
-| Hardware Race             | New platforms, spec comparisons, price trends   |
-| Deployment Scoreboard     | Total units deployed, new verticals             |
-| Funding Landscape         | Total $ raised, valuation trends, new entrants  |
-| China vs. US              | Capability gap, policy divergence, supply chain |
-| Open Source Momentum      | New releases, community adoption metrics        |
-
-**Monthly Report Structure**:
-
-```
-# 📊 Embodied AI Monthly Report — [Month Year]
-
-## Executive Summary (5 bullets)
-## Top 5 Stories of the Month
-## Thematic Deep Dive 1: [Theme]
-## Thematic Deep Dive 2: [Theme]
-## Thematic Deep Dive 3: [Theme]
-## Funding & Deal Tracker (table)
-## Deployment Tracker (table)
-## Paper Highlights (top 5 papers)
-## What to Watch Next Month
-## Monthly Statistics Dashboard
-```
-
-### Part B: System Maintenance
-
-> Performed monthly to keep the system current. See `workflow.md` § Part B for full checklist.
-
-| Step | Action                                                                   | Time   |
-| ---- | ------------------------------------------------------------------------ | ------ |
-| 1    | Update `news_source.md` — add new sources, retire inactive ones, re-tier | 20 min |
-| 2    | Update `search_queries.md` — add new keywords, refine queries            | 15 min |
-| 3    | Update `taxonomy.md` — add new companies, models, terms                  | 15 min |
-| 4    | Review `output_templates.md` — adjust metadata fields if needed          | 10 min |
-
----
-
 ## Customization Options
 
 After providing the initial briefing, offer customization:
@@ -717,7 +660,7 @@ After providing the initial briefing, offer customization:
 
 1. Switch to China Ecosystem template from `output_templates.md`
 2. Execute Recipe D queries from `search_queries.md` § 8 (Chinese Companies)
-3. Filter to 🇨🇳 category, include Chinese-language sources from `news_source.md` § Tier 6
+3. Filter to 🇨🇳 category, include Chinese-language sources from `news_sources.md` § Tier 6
 4. Use bilingual format (Chinese summaries, English source links where applicable)
 
 ### User: "This week's summary" / "这周总结"
