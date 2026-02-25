@@ -18,9 +18,16 @@ Automatically aggregates and summarizes the latest news in embodied AI and robot
 
 Multi-market (US/CN/HK) daily stock analysis skill with explicit next-trading-day close prediction, recommendation output (Buy/Hold/Sell/Watch), historical postmortem review, and rolling forecast-accuracy tracking. 🔗 [ClawHub Page](https://clawhub.ai/HeXavi8/daily-stock-analysis)
 
+### [File Compression](file-compression/SKILL.md)
+
+Compress PDF and image files with Python-first workflows and Node.js fallback. Supports PDF presets (`screen/ebook/printer/prepress`), image quality/format/resize options, transparent execution progress messaging, and retry strategies when compression results are poor.
+
 ## Getting Started
 
-Each skill can be run independently by following the instructions in its `SKILL.md`. Most skills are Node.js-based and include `npm install` setup when dependencies are required.
+Each skill can be run independently by following its `SKILL.md`.
+
+- Node.js skills: run `npm install` in the skill directory when dependencies are required.
+- Python skills: ensure a compatible Python version is available and install required packages from the skill instructions.
 
 ## License
 
