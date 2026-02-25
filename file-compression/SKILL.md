@@ -1,6 +1,18 @@
 ---
 name: file-compression
 description: Compress files to reduce storage and transfer size. Use this skill when users ask to shrink PDFs or images, optimize upload/share size, or balance quality and size. Supports PDF compression and image compression with Python-first workflows plus Node.js fallback when Python dependencies are unavailable.
+metadata:
+  {
+    "clawdbot":
+      {
+        "requires":
+          {
+            "bins": ["python3", "node", "gs"],
+            "packages": ["pikepdf", "pillow", "sharp"],
+          },
+        "primaryEnv": "python",
+      },
+  }
 ---
 
 # File Compression
@@ -18,6 +30,37 @@ Compress files with Python-first workflows and Node.js fallback workflows.
 - Compress image with quality/resize/format controls.
 - Switch backend automatically when dependencies are missing.
 - Detect bad compression results and retry with better strategy.
+
+## Installation Spec (Before Running)
+
+Required binaries:
+
+- `python3` (recommended `>= 3.8`)
+- `node`
+- `gs` (Ghostscript, required for PDF Ghostscript paths)
+
+Python install spec:
+
+```bash
+python3 -m pip install -r {baseDir}/requirements.txt
+```
+
+Node install spec:
+
+```bash
+cd {baseDir}
+npm install
+```
+
+Ghostscript install examples:
+
+- macOS: `brew install ghostscript`
+- Ubuntu/Debian: `sudo apt-get update && sudo apt-get install -y ghostscript`
+
+Safety note:
+
+- Explain to the user before each install command that third-party packages are being installed.
+- If installation fails, report the failing command and switch to available fallback backend.
 
 ## CLI Options Cheat Sheet
 

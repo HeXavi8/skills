@@ -20,7 +20,7 @@ Multi-market (US/CN/HK) daily stock analysis skill with explicit next-trading-da
 
 ### [File Compression](file-compression/SKILL.md)
 
-Compress PDF and image files with Python-first workflows and Node.js fallback. Supports PDF presets (`screen/ebook/printer/prepress`), image quality/format/resize options, transparent execution progress messaging, and retry strategies when compression results are poor.
+Compress PDF and image files with Python-first workflows and Node.js fallback. Supports PDF presets (`screen/ebook/printer/prepress`), image quality/format/resize options, transparent execution progress messaging, and retry strategies when compression results are poor. 🔗 [ClawHub Page](https://clawhub.ai/HeXavi8/file-compression)
 
 ## Getting Started
 
