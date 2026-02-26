@@ -1,11 +1,11 @@
 ---
 name: daily-stock-analysis
-description: Daily stock analysis and forecasting skill for multi-market equities (US/CN/HK), with explicit predictive pricing, next-run postmortem review, and continuous-improvement feedback loop. Use when users ask for next-trading-day close predictions, recommendation decisions (Buy/Hold/Sell/Watch), forecast correctness scoring, rolling accuracy statistics (1d/3d/7d/30d/custom), and iterative improvement of future analysis quality.
+description: Daily stock analysis and forecasting skill for multi-market equities, with explicit predictive pricing, next-run postmortem review, and continuous-improvement feedback loop. Use when users ask for next-trading-day close predictions, recommendation decisions (Buy/Hold/Sell/Watch), forecast correctness scoring, rolling accuracy statistics (1d/3d/7d/30d/custom), and iterative improvement of future analysis quality.
 ---
 
 # Daily Stock Analysis
 
-Perform market-aware, evidence-based daily stock analysis with prediction, next-run review, and rolling accuracy tracking.
+Perform market-aware, evidence-based daily stock analysis with prediction, next-run review, rolling accuracy tracking, and a structured self-evolution mechanism that updates future assumptions from observed forecast errors.
 
 ## Core Capability Focus
 
@@ -21,7 +21,51 @@ This skill is optimized around three linked capabilities:
 
 3. `continuous_improvement`
 
-- Use forecast errors and attribution patterns to improve the next run's assumptions, weighting, and risk interpretation.
+- Convert review findings into explicit, reusable improvements for the next run: assumption updates, factor-weight adjustments, event-risk handling, and confidence calibration.
+
+## Self-Evolution Loop
+
+Treat each run as labeled feedback for the next run, not just a one-off report.
+
+### Trigger Conditions
+
+Start/refresh self-evolution when any of these occurs:
+
+- Material forecast miss (`AE`/`APE` above recent baseline)
+- Wrong direction call (bullish vs bearish miss)
+- User correction that changes thesis, assumptions, or catalyst interpretation
+- Data-quality conflict or tool failure that degraded analysis confidence
+
+### Learning Record (Per Run)
+
+Create a concise learning record with:
+
+- `observation`: what was wrong or unstable
+- `root_cause`: why the miss happened
+- `action`: what to change next run
+- `scope`: where it applies (`ticker-specific` or `cross-ticker`)
+- `expiry`: when to stop applying this rule (if regime-dependent)
+
+Write this into current report via `improvement_actions` (and optional `learning_note`).
+
+### Application Priority (Next Run)
+
+Apply prior learnings before generating new prediction:
+
+1. Data quality and event handling fixes
+2. Factor-weight and horizon adjustments
+3. Confidence calibration updates
+4. Recommendation threshold tuning
+
+If multiple learnings conflict, prefer the most recent learning with better observed follow-up accuracy.
+
+### Validation and Rollback
+
+After applying a learning:
+
+- Track whether rolling metrics improve over next valid samples.
+- If no improvement after multiple samples, downgrade or remove that learning.
+- Keep only learnings that change decisions or improve calibration.
 
 ## Operation Modes
 
@@ -125,6 +169,9 @@ Each run must provide:
 
 - 1-3 concrete adjustments for the next run based on forecast review
 - Example: reduce weight on short-term momentum during event-heavy sessions
+- Optional `learning_note`: one concise self-evolution record from this run
+- Optional `learning_scope`: `ticker-specific` or `cross-ticker`
+- Optional `learning_expiry`: condition/date after which learning should be retired
 
 ## Scheduling Guidance
 
