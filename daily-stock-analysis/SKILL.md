@@ -10,9 +10,9 @@ Goal: maximize consistency across models while preserving a clear self-improveme
 ## Non-Negotiable Defaults
 
 1. Always save exactly one report file per run.
-2. Save reports under `<workspace_root>/daily-stock-analysis/reports/`.
+2. Save reports under `<working_directory>/daily-stock-analysis/reports/`.
 3. Base filename: `YYYY-MM-DD-<TICKER>-analysis.md`.
-4. Before new analysis, review prior report files for the same ticker (if any).
+4. Before new analysis, review prior report files for the same ticker (if any), including legacy locations.
 5. Report must contain machine-readable fields defined in `references/report_template.md`.
 
 ## Minimal Input Contract
@@ -58,7 +58,7 @@ Every run must include:
 
 Report folder (required):
 
-- `<workspace_root>/daily-stock-analysis/reports/`
+- `<working_directory>/daily-stock-analysis/reports/`
 
 Base report file:
 
@@ -67,10 +67,38 @@ Base report file:
 If same ticker is run multiple times on the same day and the base file already exists:
 
 1. Ask user to choose:
+
 - `overwrite`: replace existing base file
 - `new_version`: create `YYYY-MM-DD-<TICKER>-analysis-v2.md`, `-v3.md`, ...
 
 2. If user is unavailable (for unattended/automation runs), default to `new_version`.
+
+## Legacy Compatibility and Optional Migration
+
+Historical files may exist in legacy locations (within working directory only):
+
+- `<working_directory>/`
+- `<working_directory>/daily-stock-analysis/`
+
+Compatibility rules:
+
+1. Always scan legacy locations and the new reports folder before analysis.
+   - Security rule: only read files under working directory; never access paths outside it.
+2. Read legacy files when building review and accuracy history.
+3. All newly generated reports must be saved only to:
+
+- `<working_directory>/daily-stock-analysis/reports/`
+
+Optional migration flow:
+
+1. List all detected legacy files explicitly (full paths) for user review.
+2. Ask user whether to move them into the new reports folder.
+3. Only move files after explicit user confirmation.
+4. If user does not confirm, keep files in place and continue with compatibility mode.
+
+## Scheduling Recommendation
+
+Recommend users run this skill as a recurring weekday task (for example 10:00 local time) to keep prediction-review-accuracy loops continuous and comparable over time.
 
 ## Self-Improvement (Core Capability)
 
@@ -87,18 +115,22 @@ On every run:
 ## Error Handling (Strict)
 
 1. Missing historical files:
+
 - Continue analysis.
 - Mark review as `N/A (insufficient history)`.
 
 2. Missing official close price at runtime:
+
 - Mark prior review as `pending`.
 - Do not fabricate actual close.
 
 3. Conflicting sources:
+
 - Prefer official exchange/filing data.
 - Keep confidence at `Low` if conflict remains.
 
 4. Unresolvable ticker:
+
 - Stop and request clarification.
 
 ## Reference Files
