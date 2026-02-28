@@ -16,7 +16,7 @@ Automatically aggregates and summarizes the latest news in embodied AI and robot
 
 ### [Daily Stock Analysis](daily-stock-analysis/SKILL.md)
 
-Multi-market daily stock analysis skill with explicit next-trading-day close prediction, recommendation output (Buy/Hold/Sell/Watch), historical postmortem review, continuous-improvement feedback loop, and rolling forecast-accuracy tracking. 🔗 [ClawHub Page](https://clawhub.ai/HeXavi8/daily-stock-analysis)
+Deterministic global-market daily stock analysis skill designed for stable output across different models. Includes next-trading-day close prediction, recommendation output (Buy/Hold/Sell/Watch), prior forecast review, rolling forecast-accuracy tracking, and explicit self-improvement actions. 🔗 [ClawHub Page](https://clawhub.ai/HeXavi8/daily-stock-analysis)
 
 ### [File Compression](file-compression/SKILL.md)
 

@@ -1,188 +1,123 @@
 ---
 name: daily-stock-analysis
-description: Daily stock analysis and forecasting skill for multi-market equities, with explicit predictive pricing, next-run postmortem review, and continuous-improvement feedback loop. Use when users ask for next-trading-day close predictions, recommendation decisions (Buy/Hold/Sell/Watch), forecast correctness scoring, rolling accuracy statistics (1d/3d/7d/30d/custom), and iterative improvement of future analysis quality.
+description: Deterministic daily stock analysis skill for global equities. Use when users request daily stock analysis, next-trading-day close prediction, prior forecast review, prediction-accuracy calculation, and a markdown report with version control.
 ---
 
-# Daily Stock Analysis
+# Daily Stock Analysis (Stable + Self-Improving)
 
-Perform market-aware, evidence-based daily stock analysis with prediction, next-run review, rolling accuracy tracking, and a structured self-evolution mechanism that updates future assumptions from observed forecast errors.
+Goal: maximize consistency across models while preserving a clear self-improvement loop.
 
-## Core Capability Focus
+## Non-Negotiable Defaults
 
-This skill is optimized around three linked capabilities:
+1. Always save exactly one report file per run.
+2. Save reports under `<workspace_root>/daily-stock-analysis/reports/`.
+3. Base filename: `YYYY-MM-DD-<TICKER>-analysis.md`.
+4. Before new analysis, review prior report files for the same ticker (if any).
+5. Report must contain machine-readable fields defined in `references/report_template.md`.
 
-1. `price_prediction`
+## Minimal Input Contract
 
-- Predict next-trading-day closing price (`pred_close_t1`) with confidence and assumptions.
+Required:
 
-2. `postmortem_review`
+- `ticker` (preferred) or company name
 
-- Re-evaluate previous forecast against actual close and explain miss/hit attribution.
+Optional:
 
-3. `continuous_improvement`
+- `market`: free text (for example `US`, `HK`, `CN`, `JP`, `UK`, `DE`)
+- `mode`: `daily` (default) or `full_report`
+- `window_days`: default `7`
 
-- Convert review findings into explicit, reusable improvements for the next run: assumption updates, factor-weight adjustments, event-risk handling, and confidence calibration.
+If only company name is provided:
 
-## Self-Evolution Loop
+1. Resolve to ticker + exchange.
+2. If ambiguous, ask user to confirm before continuing.
 
-Treat each run as labeled feedback for the next run, not just a one-off report.
+## Deterministic Run Order
 
-### Trigger Conditions
+Follow this exact order (see `references/workflow.md`):
 
-Start/refresh self-evolution when any of these occurs:
+1. Resolve ticker/exchange/timezone/trading day.
+2. Load and review historical report files.
+3. Collect current market/news/fundamental/technical data.
+4. Generate recommendation + `pred_close_t1`.
+5. Compute review and accuracy metrics.
+6. Produce report using the fixed template.
+7. Save report file to required folder.
 
-- Material forecast miss (`AE`/`APE` above recent baseline)
-- Wrong direction call (bullish vs bearish miss)
-- User correction that changes thesis, assumptions, or catalyst interpretation
-- Data-quality conflict or tool failure that degraded analysis confidence
+## Required Output Objects
 
-### Learning Record (Per Run)
+Every run must include:
 
-Create a concise learning record with:
+- `recommendation`: Buy/Hold/Sell/Watch + trigger conditions
+- `prediction`: `pred_close_t1`, confidence, assumptions
+- `review`: `prev_pred_close_t1`, `prev_actual_close_t1`, `AE`, `APE`
+- `accuracy`: strict/loose hit rates for 1d/3d/7d/30d (as available)
+- `improvement_actions`: 1-3 concrete adjustments for next run
 
-- `observation`: what was wrong or unstable
-- `root_cause`: why the miss happened
-- `action`: what to change next run
-- `scope`: where it applies (`ticker-specific` or `cross-ticker`)
-- `expiry`: when to stop applying this rule (if regime-dependent)
+## Report Folder and Version Rules
 
-Write this into current report via `improvement_actions` (and optional `learning_note`).
+Report folder (required):
 
-### Application Priority (Next Run)
+- `<workspace_root>/daily-stock-analysis/reports/`
 
-Apply prior learnings before generating new prediction:
+Base report file:
 
-1. Data quality and event handling fixes
-2. Factor-weight and horizon adjustments
-3. Confidence calibration updates
-4. Recommendation threshold tuning
+- `YYYY-MM-DD-<TICKER>-analysis.md`
 
-If multiple learnings conflict, prefer the most recent learning with better observed follow-up accuracy.
+If same ticker is run multiple times on the same day and the base file already exists:
 
-### Validation and Rollback
+1. Ask user to choose:
+- `overwrite`: replace existing base file
+- `new_version`: create `YYYY-MM-DD-<TICKER>-analysis-v2.md`, `-v3.md`, ...
 
-After applying a learning:
+2. If user is unavailable (for unattended/automation runs), default to `new_version`.
 
-- Track whether rolling metrics improve over next valid samples.
-- If no improvement after multiple samples, downgrade or remove that learning.
-- Keep only learnings that change decisions or improve calibration.
+## Self-Improvement (Core Capability)
 
-## Operation Modes
+This skill is explicitly self-improving.
 
-1. `daily` (default)
+On every run:
 
-- Generate a concise daily report.
-- Include recommendation, next-trading-day close prediction, prior-day review (if available), and rolling accuracy metrics.
+1. Learn from previous report errors and misses.
+2. Identify repeat failure patterns (event shock, regime shift, bad assumption, timing mismatch).
+3. Write 1-3 `improvement_actions` that change next run behavior.
+4. Re-check whether those actions improve rolling accuracy.
+5. Keep useful actions, discard ineffective ones.
 
-2. `full_report` (optional)
+## Error Handling (Strict)
 
-- Generate a comprehensive investment report.
-- Expand fundamental, technical, valuation, catalysts, and risk sections.
+1. Missing historical files:
+- Continue analysis.
+- Mark review as `N/A (insufficient history)`.
 
-## Trigger Guidance
+2. Missing official close price at runtime:
+- Mark prior review as `pending`.
+- Do not fabricate actual close.
 
-Activate this skill when the user asks for:
+3. Conflicting sources:
+- Prefer official exchange/filing data.
+- Keep confidence at `Low` if conflict remains.
 
-- Daily stock analysis (for example: "Analyze AAPL for tomorrow")
-- Daily recurring review (for example: "Analyze Tencent every morning and review yesterday's forecast")
-- Trading recommendation with rationale (Buy/Hold/Sell/Watch)
-- Next-day closing price prediction
-- Forecast quality review and error tracking
-- Rolling prediction accuracy for 1/3/7/30 days or a custom window
-- A full stock report (for example: "Give me a full report for TSLA")
-
-## Input Defaults
-
-If the user does not specify values, apply these defaults:
-
-- Mode: `daily`
-- Run time: local morning run, target 10:00
-- Window: last 7 valid forecast samples
-- Language: follow user language for response content (skill docs remain English)
-- Recommendation labels: Buy / Hold / Sell / Watch
-- Report file output: write one markdown report to workspace root on every run
-
-If ticker is missing, infer from company name and confirm ticker + exchange before analysis.
-
-## Default Report Persistence
-
-Persist every run as a markdown file in workspace root so future runs can reuse history for review and accuracy computation.
-
-- Default filename format: `YYYY-MM-DD-<TICKER>-analysis.md`
-- Example: `2026-02-24-AAPL-analysis.md`
-- Include at minimum: prediction fields, prior-review fields, rolling metrics, and improvement actions
+4. Unresolvable ticker:
+- Stop and request clarification.
 
 ## Reference Files
 
-Read references as needed:
+Use these by default:
 
-- `references/workflow.md`: end-to-end execution sequence and edge handling
-- `references/search_queries.md`: market-aware web search playbook
-- `references/metrics.md`: error and accuracy definitions
-- `references/report_template.md`: output templates (`daily` and `full_report`)
-- `references/fundamental-analysis.md`: business and financial framework
-- `references/technical-analysis.md`: technical framework and indicators
-- `references/financial-metrics.md`: metric definitions and formulas
+- `references/workflow.md`
+- `references/report_template.md`
+- `references/metrics.md`
+- `references/search_queries.md`
 
-## Core Execution Rules
+Use these only in `full_report` mode:
 
-1. Verify all time-sensitive market data from current, authoritative sources.
-2. Prefer primary sources first (exchange filings, company IR, official releases), then tier-1 media.
-3. Cross-check key numbers with at least two independent sources when possible.
-4. Use market calendar and timezone correctly for US/CN/HK trading sessions.
-5. Before new analysis, first load and review previous analysis markdown files (if available) from workspace root.
-6. Clearly separate facts, assumptions, and inferences.
-7. If data is missing or conflicting, state uncertainty and reduce confidence.
-8. Always include legal disclaimer at the end.
+- `references/fundamental-analysis.md`
+- `references/technical-analysis.md`
+- `references/financial-metrics.md`
 
-## Standardized Output Contract
+## Compliance
 
-Each run must provide:
-
-1. `recommendation`
-
-- One of: Buy / Hold / Sell / Watch
-- Include trigger conditions and risk controls.
-
-2. `prediction`
-
-- `pred_close_t1`: point estimate for next trading day close
-- Optional interval `[pred_low_t1, pred_high_t1]`
-- Confidence level: High / Medium / Low
-- Key assumptions list
-
-3. `review`
-
-- Compare previous forecast vs actual close:
-  - `prev_pred_close_t1`
-  - `prev_actual_close_t1`
-  - `AE`, `APE`
-- Explain primary forecast miss/hit drivers
-
-4. `accuracy`
-
-- Rolling strict and loose hit rates for 1d/3d/7d/30d (as data permits)
-- Optional custom window if user requests
-- Optional direction accuracy
-
-5. `improvement_actions`
-
-- 1-3 concrete adjustments for the next run based on forecast review
-- Example: reduce weight on short-term momentum during event-heavy sessions
-- Optional `learning_note`: one concise self-evolution record from this run
-- Optional `learning_scope`: `ticker-specific` or `cross-ticker`
-- Optional `learning_expiry`: condition/date after which learning should be retired
-
-## Scheduling Guidance
-
-When user asks for daily automation at 10:00:
-
-- Use weekday schedule (Mon-Fri) in user's local timezone.
-- Keep schedule in automation config, not in analysis prompt text.
-- The analysis prompt should describe only the task behavior.
-
-## Compliance Disclaimer (Required)
-
-Append this (or equivalent meaning) in every report:
+Always append this disclaimer:
 
 "This content is for research and informational purposes only and does not constitute investment advice or a return guarantee. Markets are risky; invest with caution."

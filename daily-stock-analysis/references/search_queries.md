@@ -1,19 +1,46 @@
-# Search Query Templates (Market-Aware)
+# Search Query Templates (Global, Market-Aware)
 
 Use `<TICKER>`, `<COMPANY>`, `<MARKET>`, `<DATE>` placeholders.
 Always capture source URL and publication/update timestamp.
 
+This skill is not restricted to US/CN/HK. Use global exchange and regulator sources based on ticker market.
+
+## Global Baseline Queries (Use First)
+
+1. Ticker identity and listing:
+
+- `<TICKER> exchange listing market`
+- `<COMPANY> ticker symbol exchange`
+
+2. Official disclosures:
+
+- `<TICKER> official filings latest`
+- `<COMPANY> investor relations latest release`
+
+3. Market and technical snapshot:
+
+- `<TICKER> latest close open high low volume`
+- `<TICKER> RSI MACD moving average support resistance`
+
+4. Macro linkage:
+
+- `<MARKET> benchmark index today`
+- `<MARKET> central bank policy rate outlook`
+
 ## Source Priority
 
 1. Official / primary:
+
 - Exchange disclosures and filings
 - Company investor relations releases
 - Regulator filings
 
 2. Tier-1 financial media / data terminals:
+
 - Bloomberg, Reuters, CNBC, WSJ, MarketWatch, Yahoo Finance, TradingView
 
 3. Secondary aggregators:
+
 - Use for discovery only; verify key data in primary/tier-1 sources
 
 ## Cross-Verification Rule
@@ -23,43 +50,52 @@ For critical values (close, EPS, guidance, major corporate events), verify with 
 ## A) US Market Queries
 
 1. Filings and disclosures:
+
 - `<TICKER> SEC 8-K 10-Q 10-K latest`
 - `<COMPANY> investor relations earnings release <DATE>`
 
 2. Price and technical context:
+
 - `<TICKER> price volume 52-week range`
 - `<TICKER> technical analysis RSI MACD moving averages`
 - `<TICKER> options implied volatility unusual options activity`
 
 3. Analyst and news flow:
+
 - `<TICKER> analyst rating change price target`
 - `<COMPANY> latest news today Reuters Bloomberg`
 
 ## B) Hong Kong Market Queries
 
 1. Disclosures and announcements:
+
 - `<TICKER> HKEX announcement`
 - `<COMPANY> investor relations results announcement`
 
 2. Price and technical context:
+
 - `<TICKER> HK stock price volume`
 - `<TICKER> RSI MACD moving average`
 
 3. Sell-side/news flow:
+
 - `<TICKER> broker target price Hong Kong`
 - `<COMPANY> Hong Kong market news`
 
 ## C) China A-Share Market Queries
 
 1. Official disclosures:
+
 - `<TICKER> exchange announcement SSE SZSE`
 - `<COMPANY> annual report quarterly report`
 
 2. Price and technical context:
+
 - `<TICKER> A-share close volume turnover`
 - `<TICKER> technical indicator RSI MACD MA`
 
 3. News and policy context:
+
 - `<COMPANY> regulatory policy industry news`
 - `<SECTOR> China policy support demand trend`
 
