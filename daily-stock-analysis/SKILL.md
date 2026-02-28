@@ -5,26 +5,34 @@ description: Deterministic daily stock analysis skill for global equities. Use w
 
 # Daily Stock Analysis
 
-Use this skill in a command-first way to maximize cross-model consistency.
+Perform market-aware, evidence-based daily stock analysis with prediction, next-run review, rolling accuracy tracking, and a structured self-evolution mechanism that updates future assumptions from observed forecast errors.
 
 ## Hard Rules
 
 1. Read and write files only under `working_directory`.
 2. Save new reports only to:
+
 - `<working_directory>/daily-stock-analysis/reports/`
+
 3. Use filename:
+
 - `YYYY-MM-DD-<TICKER>-analysis.md`
+
 4. If same ticker/day file exists, ask user:
+
 - `overwrite` or `new_version` (`-v2`, `-v3`, ...)
 - For unattended runs, default to `new_version`
+
 5. Always review history before new prediction.
 6. Limit history read count to control token usage:
+
 - Script mode: max 5 files (default)
 - Compatibility mode: max 3 files
 
 ## Required Scripts (Use First)
 
 1. Plan output path + collect history:
+
 ```bash
 python3 {baseDir}/scripts/report_manager.py plan \
   --workdir <working_directory> \
@@ -35,6 +43,7 @@ python3 {baseDir}/scripts/report_manager.py plan \
 ```
 
 2. Compute rolling accuracy from existing reports:
+
 ```bash
 python3 {baseDir}/scripts/calc_accuracy.py \
   --workdir <working_directory> \
@@ -44,6 +53,7 @@ python3 {baseDir}/scripts/calc_accuracy.py \
 ```
 
 3. Optional: migrate legacy files after explicit user confirmation:
+
 ```bash
 python3 {baseDir}/scripts/report_manager.py migrate \
   --workdir <working_directory> \
@@ -56,13 +66,17 @@ If Python scripts are unavailable or model capability is limited, switch to mini
 
 1. Read at most 3 recent reports for the same ticker.
 2. Use only a minimal source set:
+
 - one official disclosure source
 - one reliable market data source (Yahoo Finance acceptable)
+
 3. Output concise result only:
+
 - recommendation
 - `pred_close_t1`
 - prior review (`prev_pred_close_t1`, `prev_actual_close_t1`, `AE`, `APE`) if available
 - one `improvement_action`
+
 4. Save report with same filename rules in canonical reports directory.
 
 See `references/minimal_mode.md`.
