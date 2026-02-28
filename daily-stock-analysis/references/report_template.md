@@ -7,11 +7,11 @@ Use this template exactly. Keep key names unchanged for downstream parsing.
 version: 1
 run_date: <YYYY-MM-DD>
 run_time_local: <YYYY-MM-DD HH:mm TZ>
-mode: <daily|full_report>
+mode: <daily|daily_minimal|full_report>
 ticker: <TICKER>
 exchange: <EXCHANGE>
 market: <TEXT>
-report_dir: <workspace_root>/daily-stock-analysis/reports/
+report_dir: <working_directory>/daily-stock-analysis/reports/
 output_file: <YYYY-MM-DD-TICKER-analysis.md or -vN.md>
 report_versioning_mode: <overwrite|new_version>
 history_window_days: <N>

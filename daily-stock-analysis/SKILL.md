@@ -1,148 +1,117 @@
 ---
 name: daily-stock-analysis
-description: Deterministic daily stock analysis skill for global equities. Use when users request daily stock analysis, next-trading-day close prediction, prior forecast review, prediction-accuracy calculation, and a markdown report with version control.
+description: Deterministic daily stock analysis skill for global equities. Use when users need daily analysis, next-trading-day close prediction, prior forecast review, rolling accuracy, and reliable markdown report output.
 ---
 
-# Daily Stock Analysis (Stable + Self-Improving)
+# Daily Stock Analysis
 
-Goal: maximize consistency across models while preserving a clear self-improvement loop.
+Use this skill in a command-first way to maximize cross-model consistency.
 
-## Non-Negotiable Defaults
+## Hard Rules
 
-1. Always save exactly one report file per run.
-2. Save reports under `<working_directory>/daily-stock-analysis/reports/`.
-3. Base filename: `YYYY-MM-DD-<TICKER>-analysis.md`.
-4. Before new analysis, review prior report files for the same ticker (if any), including legacy locations.
-5. Report must contain machine-readable fields defined in `references/report_template.md`.
-
-## Minimal Input Contract
-
-Required:
-
-- `ticker` (preferred) or company name
-
-Optional:
-
-- `market`: free text (for example `US`, `HK`, `CN`, `JP`, `UK`, `DE`)
-- `mode`: `daily` (default) or `full_report`
-- `window_days`: default `7`
-
-If only company name is provided:
-
-1. Resolve to ticker + exchange.
-2. If ambiguous, ask user to confirm before continuing.
-
-## Deterministic Run Order
-
-Follow this exact order (see `references/workflow.md`):
-
-1. Resolve ticker/exchange/timezone/trading day.
-2. Load and review historical report files.
-3. Collect current market/news/fundamental/technical data.
-4. Generate recommendation + `pred_close_t1`.
-5. Compute review and accuracy metrics.
-6. Produce report using the fixed template.
-7. Save report file to required folder.
-
-## Required Output Objects
-
-Every run must include:
-
-- `recommendation`: Buy/Hold/Sell/Watch + trigger conditions
-- `prediction`: `pred_close_t1`, confidence, assumptions
-- `review`: `prev_pred_close_t1`, `prev_actual_close_t1`, `AE`, `APE`
-- `accuracy`: strict/loose hit rates for 1d/3d/7d/30d (as available)
-- `improvement_actions`: 1-3 concrete adjustments for next run
-
-## Report Folder and Version Rules
-
-Report folder (required):
-
+1. Read and write files only under `working_directory`.
+2. Save new reports only to:
 - `<working_directory>/daily-stock-analysis/reports/`
-
-Base report file:
-
+3. Use filename:
 - `YYYY-MM-DD-<TICKER>-analysis.md`
+4. If same ticker/day file exists, ask user:
+- `overwrite` or `new_version` (`-v2`, `-v3`, ...)
+- For unattended runs, default to `new_version`
+5. Always review history before new prediction.
+6. Limit history read count to control token usage:
+- Script mode: max 5 files (default)
+- Compatibility mode: max 3 files
 
-If same ticker is run multiple times on the same day and the base file already exists:
+## Required Scripts (Use First)
 
-1. Ask user to choose:
+1. Plan output path + collect history:
+```bash
+python3 {baseDir}/scripts/report_manager.py plan \
+  --workdir <working_directory> \
+  --ticker <TICKER> \
+  --run-date <YYYY-MM-DD> \
+  --versioning auto \
+  --history-limit 5
+```
 
-- `overwrite`: replace existing base file
-- `new_version`: create `YYYY-MM-DD-<TICKER>-analysis-v2.md`, `-v3.md`, ...
+2. Compute rolling accuracy from existing reports:
+```bash
+python3 {baseDir}/scripts/calc_accuracy.py \
+  --workdir <working_directory> \
+  --ticker <TICKER> \
+  --windows 1,3,7,30 \
+  --history-limit 60
+```
 
-2. If user is unavailable (for unattended/automation runs), default to `new_version`.
+3. Optional: migrate legacy files after explicit user confirmation:
+```bash
+python3 {baseDir}/scripts/report_manager.py migrate \
+  --workdir <working_directory> \
+  --file <ABS_PATH_1> --file <ABS_PATH_2>
+```
 
-## Legacy Compatibility and Optional Migration
+## Compatibility Mode (No Python / Small Model)
 
-Historical files may exist in legacy locations (within working directory only):
+If Python scripts are unavailable or model capability is limited, switch to minimal mode:
 
-- `<working_directory>/`
-- `<working_directory>/daily-stock-analysis/`
+1. Read at most 3 recent reports for the same ticker.
+2. Use only a minimal source set:
+- one official disclosure source
+- one reliable market data source (Yahoo Finance acceptable)
+3. Output concise result only:
+- recommendation
+- `pred_close_t1`
+- prior review (`prev_pred_close_t1`, `prev_actual_close_t1`, `AE`, `APE`) if available
+- one `improvement_action`
+4. Save report with same filename rules in canonical reports directory.
 
-Compatibility rules:
+See `references/minimal_mode.md`.
 
-1. Always scan legacy locations and the new reports folder before analysis.
-   - Security rule: only read files under working directory; never access paths outside it.
-2. Read legacy files when building review and accuracy history.
-3. All newly generated reports must be saved only to:
+## Minimal Run Protocol
 
-- `<working_directory>/daily-stock-analysis/reports/`
+1. Resolve ticker/exchange/market (ask if ambiguous).
+2. Run `report_manager.py plan`.
+3. Read `history_files` returned by script.
+4. If `legacy_files` exist, list all absolute paths and ask whether to migrate.
+5. Gather data using `references/sources.md` + `references/search_queries.md`.
+6. Run `calc_accuracy.py` for consistent metrics.
+7. Render report using `references/report_template.md`.
+8. Save to `selected_output_file` returned by `report_manager.py`.
 
-Optional migration flow:
+## Required Output Fields
 
-1. List all detected legacy files explicitly (full paths) for user review.
-2. Ask user whether to move them into the new reports folder.
-3. Only move files after explicit user confirmation.
-4. If user does not confirm, keep files in place and continue with compatibility mode.
+Must include:
+
+- `recommendation`
+- `pred_close_t1`
+- `prev_pred_close_t1`
+- `prev_actual_close_t1`
+- `AE`, `APE`
+- rolling strict/loose accuracy fields
+- `improvement_actions`
+
+## Self-Improvement (Required)
+
+Each run must include 1-3 concrete `improvement_actions` from recent misses and use them in the next run.
+Do not skip this step.
 
 ## Scheduling Recommendation
 
-Recommend users run this skill as a recurring weekday task (for example 10:00 local time) to keep prediction-review-accuracy loops continuous and comparable over time.
+Recommend users set this as a weekday recurring task (for example 10:00 local time) to keep prediction-review windows continuous.
 
-## Self-Improvement (Core Capability)
+## References
 
-This skill is explicitly self-improving.
-
-On every run:
-
-1. Learn from previous report errors and misses.
-2. Identify repeat failure patterns (event shock, regime shift, bad assumption, timing mismatch).
-3. Write 1-3 `improvement_actions` that change next run behavior.
-4. Re-check whether those actions improve rolling accuracy.
-5. Keep useful actions, discard ineffective ones.
-
-## Error Handling (Strict)
-
-1. Missing historical files:
-
-- Continue analysis.
-- Mark review as `N/A (insufficient history)`.
-
-2. Missing official close price at runtime:
-
-- Mark prior review as `pending`.
-- Do not fabricate actual close.
-
-3. Conflicting sources:
-
-- Prefer official exchange/filing data.
-- Keep confidence at `Low` if conflict remains.
-
-4. Unresolvable ticker:
-
-- Stop and request clarification.
-
-## Reference Files
-
-Use these by default:
+Default:
 
 - `references/workflow.md`
 - `references/report_template.md`
 - `references/metrics.md`
 - `references/search_queries.md`
+- `references/sources.md`
+- `references/minimal_mode.md`
+- `references/security.md`
 
-Use these only in `full_report` mode:
+Deep-dive only (`full_report` mode):
 
 - `references/fundamental-analysis.md`
 - `references/technical-analysis.md`
@@ -150,6 +119,6 @@ Use these only in `full_report` mode:
 
 ## Compliance
 
-Always append this disclaimer:
+Always append:
 
 "This content is for research and informational purposes only and does not constitute investment advice or a return guarantee. Markets are risky; invest with caution."

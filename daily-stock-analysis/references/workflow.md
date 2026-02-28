@@ -1,118 +1,104 @@
-# Workflow (Deterministic)
+# Workflow (Command-First)
 
-Use this exact sequence to reduce model variance.
+Use this sequence exactly.
 
-## Step 1: Resolve Instrument Context
+## 0) Choose Execution Mode
 
-1. Resolve `ticker`, `exchange`, `market` (global; not restricted to specific regions).
-2. Resolve user-local date and target market trading calendar.
-3. Resolve next valid trading day (`t+1`).
+Use `script` mode by default.
 
-If ticker is ambiguous, stop and ask user.
+Switch to `compatibility` mode when:
 
-## Step 2: Review Historical Reports First (Required)
+- `python3` is unavailable, or
+- model capability is low and deterministic minimal output is preferred.
 
-1. Scan all compatible locations (working directory only):
+## 1) Resolve Instrument
 
-- `<working_directory>/daily-stock-analysis/reports/` (new canonical)
-- `<working_directory>/daily-stock-analysis/` (legacy)
-- `<working_directory>/` (legacy)
+- Resolve `ticker`, `exchange`, `market`, and next valid trading day.
+- If ticker is ambiguous, stop and ask user.
 
-2. Read files matching:
+## 2) Plan Files and History
 
-- `YYYY-MM-DD-<TICKER>-analysis.md`
-- `YYYY-MM-DD-<TICKER>-analysis-vN.md`
+Run:
 
-3. Load from newest to oldest.
-4. Default history depth: last 7 valid files (or user-provided window).
-5. Extract:
+```bash
+python3 {baseDir}/scripts/report_manager.py plan \
+  --workdir <working_directory> \
+  --ticker <TICKER> \
+  --run-date <YYYY-MM-DD> \
+  --versioning auto \
+  --history-limit 5
+```
 
-- `pred_close_t1`, `actual_close_t1` (if present)
-- prior `AE`, `APE`, hit status
-- prior `improvement_actions`
+Use returned JSON fields:
 
-If none found, set bootstrap status and continue.
+- `selected_output_file`
+- `requires_user_choice`
+- `history_files`
+- `legacy_files`
 
-## Step 2.1: Optional Legacy File Migration (Ask First)
+If `requires_user_choice=true`, ask user `overwrite` vs `new_version`.
+Read only `history_files` returned by script (default max 5).
 
-If legacy files are found outside `reports/`:
+## 3) Legacy Compatibility (Optional Migration)
 
-1. List all legacy files explicitly (absolute paths) for user inspection.
-2. Ask user whether to migrate all listed files into:
+- Read legacy files from `legacy_files` for review history.
+- If user agrees to migrate, run:
 
-- `<workspace_root>/daily-stock-analysis/reports/`
+```bash
+python3 {baseDir}/scripts/report_manager.py migrate \
+  --workdir <working_directory> \
+  --file <ABS_PATH_1> --file <ABS_PATH_2>
+```
 
-3. Only migrate after explicit confirmation.
-4. If no confirmation is provided, keep compatibility mode and continue.
-5. Security rule: do not read or move files outside working directory.
+Security: only process files under `working_directory`.
 
-## Step 3: Collect Current Data
+## 4) Collect New Data
 
-Collect and timestamp:
+- Use `references/sources.md` tier priority.
+- Use `references/search_queries.md` templates.
+- For critical values, cross-check with at least 2 sources.
 
-1. Market: latest/close/open/high/low/volume
-2. News/events: filings, announcements, major headlines
-3. Fundamentals: growth, margins, leverage, cash flow
-4. Technicals: trend, MA, RSI, MACD, support/resistance
-5. Macro: rates, FX, commodities/index regime when relevant
+## 5) Compute Accuracy via Script
 
-## Step 4: Generate Analysis and Prediction
+Run:
 
-Output:
+```bash
+python3 {baseDir}/scripts/calc_accuracy.py \
+  --workdir <working_directory> \
+  --ticker <TICKER> \
+  --windows 1,3,7,30 \
+  --history-limit 60
+```
 
-1. `recommendation`: Buy/Hold/Sell/Watch with entry/exit/invalidation triggers
-2. `prediction`:
+Use script output to fill rolling accuracy fields.
 
-- `pred_close_t1` (required)
-- optional range
-- confidence
-- assumptions
+## 6) Generate Report
 
-## Step 5: Compute Review and Accuracy
+- Render with `references/report_template.md`.
+- Keep all required frontmatter keys.
+- Include `improvement_actions`.
 
-Using `metrics.md`:
+## 7) Persist and Return
 
-1. Prior-run review (if actual is available):
+- Save to `selected_output_file` from step 2.
+- Return summary + absolute file path + pending/blocked status.
 
-- `AE`, `APE`, strict/loose hit
+## 8) Recommended Operation
 
-2. Rolling accuracy:
+Use recurring weekday schedule to stabilize review windows and success rate.
 
-- 1d, 3d, 7d, 30d, custom (if requested)
-- include sample size `n`
+## Compatibility Mode (Fallback)
 
-3. Improvement actions:
+When scripts cannot run:
 
-- 1-3 concrete adjustments for next run
-
-## Step 6: Render with Fixed Template
-
-Render using `report_template.md`.
-
-- Include required machine-readable frontmatter.
-- Keep all required keys even when value is `N/A`.
-
-## Step 7: Persist to Report Folder (Required)
-
-1. Ensure folder exists:
-
-- `<working_directory>/daily-stock-analysis/reports/`
-
-2. Base filename:
-
-- `YYYY-MM-DD-<TICKER>-analysis.md`
-
-3. If base file exists on same day and same ticker:
-
-- Ask user: `overwrite` or `new_version`.
-- If no user response available, use `new_version`.
-- Version pattern: `YYYY-MM-DD-<TICKER>-analysis-v2.md`, `-v3.md`, ...
-
-## Step 8: Final Response
-
-Return:
-
-1. one-paragraph summary
-2. absolute saved file path
-3. whether run used overwrite or versioning
-4. any blocked/pending status
+1. Manually locate report files only under `working_directory`.
+2. Read at most 3 recent same-ticker reports.
+3. Collect minimal sources:
+- one official disclosure source
+- one reliable market data source
+4. Produce minimal output:
+- recommendation
+- `pred_close_t1`
+- prior review metrics (if available)
+- one `improvement_action`
+5. Save report in canonical reports directory using standard filename rules.
